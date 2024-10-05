@@ -267,6 +267,12 @@ class GameScene extends Phaser.Scene {
         this.load.image('sound_on', 'assets/Game/sound_on.png');
         this.load.image('Clock', 'assets/Game/Clock.png');
         this.load.image('Clock_progression_bar', 'assets/Game/Clock_progression_bar.png');
+        this.load.image('pause_interface', 'assets/Game/pause_interface.png' )
+
+        this.load.image('Home', 'assets/Game/Home.png' )
+        this.load.image('réessayer_bouton', 'assets/Game/réessayer_bouton.png' )
+        this.load.image('Replay_button', 'assets/Game/Replay_button.png' )
+
         this.load.audio('flip', 'assets/retournement.mp3');
         this.load.audio('correct', 'assets/correct.mp3');
         this.load.audio('start', 'assets/game-start.mp3');
@@ -312,11 +318,21 @@ class GameScene extends Phaser.Scene {
     }
 
     createUI() {
+        this.home = this.add.image(this.cameras.main.width/4, this.cameras.main.height/2, "Home").setInteractive().setOrigin(0.5, 0).setDepth(100).setScale(0)
+
+        this.replay = this.add.image(this.cameras.main.width*3/4, this.cameras.main.height/2, "Replay_button").setInteractive().setOrigin(0.5, 0).setDepth(100).setScale(0)
+
+        this.reesayer = this.add.image(this.cameras.main.width/2, this.cameras.main.height/2, "réessayer_bouton").setInteractive().setOrigin(0.5, 0).setDepth(100).setScale(0)
+
+        this.sound = this.add.image(this.cameras.main.width - 10, 10, "sound_on").setInteractive().setOrigin(1, 0)
+
         this.sound = this.add.image(this.cameras.main.width - 10, 10, "sound_on").setInteractive().setOrigin(1, 0)
 
         this.music = this.add.image(this.cameras.main.width - 70, 10, "music_on").setInteractive().setOrigin(1, 0)
 
         const pauseButton = this.add.image(10, 10, "Pause_button").setInteractive().setOrigin(0, 0);
+
+        this.pauseInterface = this.add.image(this.cameras.main.width/2, this.cameras.main.height/2, 'pause_interface').setInteractive().setDepth(99).setScale(0)
 
         this.add.image(this.cameras.main.width/2, this.cameras.main.height/7, "Clock").setInteractive().setOrigin(0.5, 0.5);
 
@@ -346,6 +362,11 @@ class GameScene extends Phaser.Scene {
 
         pauseButton.on('pointerdown', () =>{
             play = !play
+            this.tweens.add({
+                targets: [this.pauseInterface, this.replay, this.reesayer, this.home],
+                scale: 1,
+                duration: 100
+            });
         })
 
 
