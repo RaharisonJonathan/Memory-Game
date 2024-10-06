@@ -368,35 +368,6 @@ class GameScene extends Phaser.Scene {
                 duration: 100
             });
         })
-
-
-        // this.homeButton.on('pointerdown', () =>{
-        //     this.tweens.add({
-        //         targets: this.homeButton,
-        //         scaleX: 0.9,
-        //         scaleY: 0.9,
-        //         duration: 100,
-        //         onComplete: () => {
-        //             this.tweens.add({
-        //                 targets: this.homeButton,
-        //                 scaleX: 1,
-        //                 scaleY: 1,
-        //                 duration: 100,
-        //                 onComplete: () => {
-        //                     this.cameras.main.fadeOut(500, 0, 0, 0);
-        //                     this.scene.transition({
-        //                         target: 'StartScene',
-        //                         duration: 1000,
-        //                         moveAbove: true,
-        //                         onUpdate: (progress) => {
-        //                             this.cameras.main.x = 800 * progress;
-        //                         }
-        //                     });
-        //                 }
-        //             });
-        //         }
-        //     });
-        // })
     }
 
 
