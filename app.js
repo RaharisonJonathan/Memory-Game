@@ -639,11 +639,6 @@ class GameScene extends Phaser.Scene {
     endGame() {
         this.timerEvent.remove(); // Arrêter la minuterie
         console.log("Temps écoulé !"); // Afficher un message ou une scène de fin de jeu
-        // Optionnel : Ajouter des effets ou transitions de fin de jeu ici
-        // this.add.text(this.cameras.main.width/2, this.cameras.main.height/2, `Le temps est écoulé`, {
-        //     fontSize: '30px',
-        //     fill: '#fff'
-        // }).setDepth(20).setOrigin(0.5, 0.5);
 
         this.cards.map((card) =>{
             card.setVisible(false)
