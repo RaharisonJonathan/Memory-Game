@@ -7,17 +7,12 @@ let play = true
 
 let currentLevelUnlocked = localStorage.getItem('currentLevel')
 
-        if(currentLevelUnlocked){
-            unlocked = currentLevelUnlocked
-            console.log(currentLevelUnlocked)
-        }
-        else{
-            localStorage.setItem("currentLevel", unlocked)
-            currentLevelUnlocked = unlocked
+        if(!currentLevelUnlocked){
+            localStorage.setItem('currentLevel', 1)
         }
 
 
-let music;
+let music, flip, correct, start;
 class StartScene extends Phaser.Scene {
     constructor() {
         super({ key: 'StartScene' });
@@ -41,9 +36,14 @@ class StartScene extends Phaser.Scene {
             ['toggleOn', 'assets/Accueil/toggle_on.png']
         ];
         
+        
+        this.load.audio('music', 'assets/music1.mp3');
+        this.load.audio('flip', 'assets/retournement.mp3');
+        this.load.audio('correct', 'assets/correct.mp3');
+        this.load.audio('start', 'assets/game-start.mp3');
         assets.forEach(([key, path]) => this.load.image(key, path));
     }
-
+    
     create() {
         
         this.addBackground();
@@ -51,16 +51,19 @@ class StartScene extends Phaser.Scene {
         this.addButtons();
         this.addPopup();
         this.addSettingsWindow();
-        this.load.audio('music', 'assets/music1.mp3');
-        this.load.start();
 
-        this.load.on('complete', () => {
             music = this.sound.add('music', {loop : true, volume : 0.2});
+            flip = this.sound.add('flip', {volume : 0.5});
+            correct = this.sound.add('correct', {volume : 0.5});
+            start = this.sound.add('start', { volume : 0.2});
+
+            console.log(music, flip, start, correct)
+            
             
             if(playMusic){
                 music.play()
             }
-        });
+        
 
         this.tweens.add({
             targets: this.Logo,
@@ -273,26 +276,26 @@ class GameScene extends Phaser.Scene {
         this.load.image('réessayer_bouton', 'assets/Game/réessayer_bouton.png' )
         this.load.image('Replay_button', 'assets/Game/Replay_button.png' )
 
-        this.load.audio('flip', 'assets/retournement.mp3');
-        this.load.audio('correct', 'assets/correct.mp3');
-        this.load.audio('start', 'assets/game-start.mp3');
+        
         Data.forEach(data => this.load.image(data.key, `assets/Game/animals/${data.key}.png`));
     }
     
     create() {
         this.timeLeft = levelTime; // Temps initial en secondes
         
-        // this.cardFlipSound = this.sound.add('cardFlip');
+        // flip = this.sound.add('cardFlip');
         
         this.load.start();
         
         // Jouer la musique de fond après avoir fini de la charger
-        this.cardFlipSound = this.sound.add('flip');
-        this.correct = this.sound.add('correct');
-        this.start = this.sound.add('start');
-        if(playSound){
-            this.start.play()
-        }
+        // if(this.sound){
+        //     flip = this.sound.add('flip');
+        //     correct = this.sound.add('correct');
+        //     this.start = this.sound.add('start');
+            if(playSound){
+                start.play()
+            }
+        // }
         
         this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'game_background')
         .setOrigin(0.5)
@@ -368,6 +371,43 @@ class GameScene extends Phaser.Scene {
                 duration: 100
             });
         })
+
+        this.replay.on('pointerdown', () =>{
+            play = !play
+            this.tweens.add({
+                targets: [this.pauseInterface, this.replay, this.reesayer, this.home],
+                scale: 0,
+                duration: 100
+            });
+        })
+
+        this.reesayer.on('pointerdown', () => {
+            play = !play;
+            this.tweens.add({
+                targets: [this.pauseInterface, this.replay, this.reesayer, this.home],
+                scale: 0,
+                duration: 100,
+                onComplete: () => {
+                    this.scene.restart()
+                    console.log(this.sound)
+                }
+            });
+        });
+        
+
+        this.home.on('pointerdown', () =>{
+            play = !play
+            music.stop()
+            this.cameras.main.fadeOut(500, 0, 0, 0);
+                this.scene.transition({
+                    target: "StartScene",
+                    duration: 1000,
+                    moveAbove: true,
+                    onUpdate: (progress) => {
+                        this.cameras.main.x = 800 * progress;
+                    }
+                });
+        })
     }
 
 
@@ -442,7 +482,7 @@ class GameScene extends Phaser.Scene {
         this.animateFlip(card, cardChange);
         
         if(playSound){
-            this.cardFlipSound.play();
+            flip.play();
         }
     }
 
@@ -493,7 +533,7 @@ class GameScene extends Phaser.Scene {
         //     duration: 200,
         //     onComplete: () => {
             if(playSound){
-                this.correct.play()
+                correct.play()
             }
             this.tweens.add({
                     targets: [this.firstCard, this.secondCard],
@@ -521,7 +561,7 @@ class GameScene extends Phaser.Scene {
             duration: 100,
             onStart : () =>{
                 if(playSound){
-                    this.cardFlipSound.play()
+                    flip.play()
                 }
             },
             onComplete: () => {
@@ -551,11 +591,12 @@ class GameScene extends Phaser.Scene {
     checkForWin() {
         
         if (this.cards.length === 0) {
-        console.log(currentLevelUnlocked, gridConfig.level)
+            currentLevelUnlocked = localStorage.getItem('currentLevel')
+            console.log(currentLevelUnlocked, gridConfig.level)
             if(currentLevelUnlocked == gridConfig.level){
-                unlocked++;
-                console.log(unlocked)
-                localStorage.setItem("currentLevel", unlocked)
+                currentLevelUnlocked++;
+                console.log(currentLevelUnlocked)
+                localStorage.setItem("currentLevel", currentLevelUnlocked)
             }
 
             console.log("Gagner");
@@ -589,7 +630,7 @@ class GameScene extends Phaser.Scene {
        }
        else{
         this.cards.map((card) =>{
-            card.setVisible(false)
+            // card.setVisible(false)
         })
        }
 
@@ -1025,8 +1066,9 @@ class LevelSelectScene extends Phaser.Scene {
     }
 
     unlockedLevels() {
+        let unlockLevels = localStorage.getItem('currentLevel')
         // Retourner le nombre de niveaux débloqués (logique simplifiée ici)
-        return unlocked; // Exemple: 8 niveaux débloqués sur 16
+        return unlockLevels; // Exemple: 8 niveaux débloqués sur 16
     }
 
     selectLevel(levelIndex) {
@@ -1078,9 +1120,6 @@ const config = {
     height: 800, // Hauteur fixe
     scale: {
         mode: Phaser.Scale.FIT,
-    },
-    audio: {
-        disableWebAudio: false
     },
     scene: [StartScene, GameScene, TypesScene, GridScene, LevelSelectScene]
 };
