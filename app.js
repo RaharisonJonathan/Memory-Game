@@ -275,6 +275,9 @@ class GameScene extends Phaser.Scene {
         this.load.image('Home', 'assets/Game/Home.png' )
         this.load.image('réessayer_bouton', 'assets/Game/réessayer_bouton.png' )
         this.load.image('Replay_button', 'assets/Game/Replay_button.png' )
+        this.load.image('success_interface', 'assets/Game/success_interface.png')
+        this.load.image('star', 'assets/Game/star.png')
+        this.load.image('star_success', 'assets/Game/star_success.png')
 
         
         Data.forEach(data => this.load.image(data.key, `assets/Game/animals/${data.key}.png`));
@@ -329,17 +332,31 @@ class GameScene extends Phaser.Scene {
 
         this.sound = this.add.image(this.cameras.main.width - 10, 10, "sound_on").setInteractive().setOrigin(1, 0)
 
-        this.sound = this.add.image(this.cameras.main.width - 10, 10, "sound_on").setInteractive().setOrigin(1, 0)
-
         this.music = this.add.image(this.cameras.main.width - 70, 10, "music_on").setInteractive().setOrigin(1, 0)
 
-        const pauseButton = this.add.image(10, 10, "Pause_button").setInteractive().setOrigin(0, 0);
+        this.pauseButton = this.add.image(10, 10, "Pause_button").setInteractive().setOrigin(0, 0);
 
         this.pauseInterface = this.add.image(this.cameras.main.width/2, this.cameras.main.height/2, 'pause_interface').setInteractive().setDepth(99).setScale(0)
 
-        this.add.image(this.cameras.main.width/2, this.cameras.main.height/7, "Clock").setInteractive().setOrigin(0.5, 0.5);
+
+        this.successInterface = this.add.image(this.cameras.main.width/2, this.cameras.main.height/2, 'success_interface').setInteractive().setDepth(99).setScale(0)
+
+        this.clock = this.add.image(this.cameras.main.width/2, this.cameras.main.height/7, "Clock").setOrigin(0.5, 0.5);
+
+        this.star1 = this.add.image(this.cameras.main.width/2 - 80, this.cameras.main.height/2 - 80, "star").setOrigin(0.5, 0.5).setDepth(100).setScale(0);
+        this.star2 = this.add.image(this.cameras.main.width/2, this.cameras.main.height/2 - 115, "star").setOrigin(0.5, 0.5).setDepth(100).setScale(0);
+        this.star3 = this.add.image(this.cameras.main.width/2 + 80, this.cameras.main.height/2 - 80, "star").setOrigin(0.5, 0.5).setDepth(100).setScale(0);
+
+        this.star1_success = this.add.image(this.cameras.main.width/2 - 80, this.cameras.main.height/2 - 80, "star_success").setOrigin(0.5, 0.5).setDepth(101).setScale(0);
+        this.star2_success = this.add.image(this.cameras.main.width/2, this.cameras.main.height/2 - 115, "star_success").setOrigin(0.5, 0.5).setDepth(101).setScale(0);
+        this.star3_success = this.add.image(this.cameras.main.width/2 + 80, this.cameras.main.height/2 - 80, "star_success").setOrigin(0.5, 0.5).setDepth(101).setScale(0);
+
+
+        
 
         this.clock_progression = this.add.image(this.cameras.main.width/2 - 94, this.cameras.main.height/7, "Clock_progression_bar").setInteractive().setOrigin(0, 0.5);
+
+    
 
         this.sound.on('pointerup', () => {
             if(playSound){
@@ -363,7 +380,7 @@ class GameScene extends Phaser.Scene {
             }
         });
 
-        pauseButton.on('pointerdown', () =>{
+        this.pauseButton.on('pointerdown', () =>{
             play = !play
             this.tweens.add({
                 targets: [this.pauseInterface, this.replay, this.reesayer, this.home],
@@ -591,6 +608,55 @@ class GameScene extends Phaser.Scene {
     checkForWin() {
         
         if (this.cards.length === 0) {
+
+            this.tweens.add({
+                targets: [this.pauseInterface, this.replay, this.reesayer, this.home, this.pauseButton, this.clock_progression, this.music, this.sound, this.clock],
+                scale: 0,
+                duration: 10,
+                onComplete: () =>{
+                    this.tweens.add({
+                        targets: [this.successInterface],
+                        scale: 0,
+                        duration: 500,
+                        onComplete: () =>{
+                            this.tweens.add({
+                                targets: [this.successInterface, this.star1, this.star2, this.star3],
+                                scale: 1,
+                                duration: 100,
+                                onComplete : () =>{
+                                    this.tweens.add({
+                                        targets : this.successInterface,
+                                        scale : 1,
+                                        duration : 1000,
+                                        onComplete : () =>{
+                                            this.tweens.add({
+                                                targets: this.star1_success,
+                                                scale: 1,
+                                                duration: 400,
+                                                onComplete : () =>{
+                                                    this.tweens.add({
+                                                        targets: this.star2_success,
+                                                        scale: 1,
+                                                        duration: 400,
+                                                        onComplete : () =>{
+                                                            this.tweens.add({
+                                                                targets: this.star3_success,
+                                                                scale: 1,
+                                                                duration: 400
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    })
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+            
             currentLevelUnlocked = localStorage.getItem('currentLevel')
             console.log(currentLevelUnlocked, gridConfig.level)
             if(currentLevelUnlocked == gridConfig.level){
