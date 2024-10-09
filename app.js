@@ -52,7 +52,7 @@ class StartScene extends Phaser.Scene {
         this.addPopup();
         this.addSettingsWindow();
 
-            music = this.sound.add('music', {loop : true, volume : 0.2});
+            music = this.sound.add('music', {loop : true, volume : 0});
             flip = this.sound.add('flip', {volume : 0.5});
             correct = this.sound.add('correct', {volume : 0.5});
             start = this.sound.add('start', { volume : 0.2});
@@ -276,6 +276,7 @@ class GameScene extends Phaser.Scene {
         this.load.image('réessayer_bouton', 'assets/Game/réessayer_bouton.png' )
         this.load.image('Replay_button', 'assets/Game/Replay_button.png' )
         this.load.image('success_interface', 'assets/Game/success_interface.png')
+        this.load.image('failed_interface', 'assets/Game/failed_interface.png')
         this.load.image('star', 'assets/Game/star.png')
         this.load.image('star_success', 'assets/Game/star_success.png')
 
@@ -340,6 +341,8 @@ class GameScene extends Phaser.Scene {
 
 
         this.successInterface = this.add.image(this.cameras.main.width/2, this.cameras.main.height/2, 'success_interface').setInteractive().setDepth(99).setScale(0)
+
+        this.failedInterface = this.add.image(this.cameras.main.width/2, this.cameras.main.height/2, 'failed_interface').setInteractive().setDepth(99).setScale(0)
 
         this.clock = this.add.image(this.cameras.main.width/2, this.cameras.main.height/7, "Clock").setOrigin(0.5, 0.5);
 
@@ -627,7 +630,7 @@ class GameScene extends Phaser.Scene {
                                     this.tweens.add({
                                         targets : this.successInterface,
                                         scale : 1,
-                                        duration : 1000,
+                                        duration : 500,
                                         onComplete : () =>{
                                             this.tweens.add({
                                                 targets: this.star1_success,
@@ -709,6 +712,26 @@ class GameScene extends Phaser.Scene {
         this.cards.map((card) =>{
             card.setVisible(false)
         })
+
+        this.tweens.add({
+            targets: [this.pauseInterface, this.replay, this.reesayer, this.home, this.pauseButton, this.clock_progression, this.music, this.sound, this.clock],
+            scale: 0,
+            duration: 10,
+            onComplete: () =>{
+                this.tweens.add({
+                    targets: [this.pauseInterface],
+                    scale: 0,
+                    duration: 500,
+                    onComplete: () =>{
+                        this.tweens.add({
+                            targets: [this.failedInterface, this.star1, this.star2, this.star3],
+                            scale: 1,
+                            duration: 100,
+                        });
+                    }
+                });
+            }
+        });
         
     }
     // Activation de la qualité de l'image
@@ -1078,12 +1101,11 @@ class LevelSelectScene extends Phaser.Scene {
         // Créer une grille de niveaux
         const rows = 4; // Nombre de rangées de niveaux
         const cols = 3; // Nombre de colonnes de niveaux
-        const totalLevels = 12; // Total des niveaux affichés
         
         const cardWidth = 80;
         const cardHeight = 80;
-        const spacingX = 20;
-        const spacingY = 25;
+        const spacingX = 30;
+        const spacingY = 40;
 
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
