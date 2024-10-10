@@ -7,6 +7,7 @@ let unlocked = 1;
 let play = true;
 
 let passed = true;
+let LevelActually;
 
 let currentLevelUnlocked = localStorage.getItem('currentLevel') || 1;
 localStorage.setItem('currentLevel', currentLevelUnlocked);
@@ -829,16 +830,16 @@ class LevelSelectScene extends Phaser.Scene {
     }
 
     selectLevel(levelIndex) {
-        this.selectedLevel = levelIndex;
+        LevelActually = levelIndex - 1
 
-        gridConfig.rows = LevelList[levelIndex -1].row;
-        gridConfig.cols = LevelList[levelIndex -1].col;
-        gridConfig.level = LevelList[levelIndex -1].level;
-        levelTime = LevelList[levelIndex -1].time
+        gridConfig.rows = LevelList[LevelActually].row;
+        gridConfig.cols = LevelList[LevelActually].col;
+        gridConfig.level = LevelList[LevelActually].level;
+        levelTime = LevelList[LevelActually].time
 
         gridConfig.scale = Math.min(
-            (this.cameras.main.width - 20 - 10 * (LevelList[levelIndex -1].row - 1)) / (gridConfig.cardWidth * LevelList[levelIndex -1].row),
-            (this.cameras.main.height * 6.5 / 8 - 20 - 10 * (LevelList[levelIndex -1].col - 1)) / (gridConfig.cardWidth * LevelList[levelIndex -1].col)
+            (this.cameras.main.width - 20 - 10 * (LevelList[LevelActually].row - 1)) / (gridConfig.cardWidth * LevelList[LevelActually].row),
+            (this.cameras.main.height * 6.5 / 8 - 20 - 10 * (LevelList[LevelActually].col - 1)) / (gridConfig.cardWidth * LevelList[LevelActually].col)
             );
         
 
@@ -940,6 +941,16 @@ class SuccessScene extends Phaser.Scene {
         })
 
         this.NextLevel.on('pointerdown', () =>{
+            LevelActually++
+            gridConfig.rows = LevelList[LevelActually].row;
+            gridConfig.cols = LevelList[LevelActually].col;
+            gridConfig.level = LevelList[LevelActually].level;
+            levelTime = LevelList[LevelActually].time
+
+            gridConfig.scale = Math.min(
+                (this.cameras.main.width - 20 - 10 * (LevelList[LevelActually].row - 1)) / (gridConfig.cardWidth * LevelList[LevelActually].row),
+                (this.cameras.main.height * 6.5 / 8 - 20 - 10 * (LevelList[LevelActually].col - 1)) / (gridConfig.cardWidth * LevelList[LevelActually].col)
+                );
             this.cameras.main.fadeOut(500, 0, 0, 0);
             this.scene.transition({
                 target: 'GameScene',
