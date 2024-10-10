@@ -1,18 +1,18 @@
 
-let playMusic = true
-let playSound = true
-let levelTime = 1000
-let unlocked = 1
-let play = true
+let playMusic = true;
+let playSound = true;
+let levelTime = 1000;
+let starNote = 0;
+let unlocked = 1;
+let play = true;
 
-let currentLevelUnlocked = localStorage.getItem('currentLevel')
+let passed = true;
 
-        if(!currentLevelUnlocked){
-            localStorage.setItem('currentLevel', 1)
-        }
-
+let currentLevelUnlocked = localStorage.getItem('currentLevel') || 1;
+localStorage.setItem('currentLevel', currentLevelUnlocked);
 
 let music, flip, correct, start;
+
 class StartScene extends Phaser.Scene {
     constructor() {
         super({ key: 'StartScene' });
@@ -21,7 +21,6 @@ class StartScene extends Phaser.Scene {
 
     preload() {
         const assets = [
-            // ['background', 'assets/Accueil/Accueil_background.svg'],
             ['background', 'Accueil_background.jfif'],
             ['Logo', 'assets/Accueil/Logo.png'],
             ['startButton', 'assets/Accueil/start_button.png'],
@@ -35,61 +34,52 @@ class StartScene extends Phaser.Scene {
             ['toggleOff', 'assets/Accueil/toggle_off.png'],
             ['toggleOn', 'assets/Accueil/toggle_on.png']
         ];
-        
-        
+
+        assets.forEach(([key, path]) => this.load.image(key, path));
+
+        // Audio files
         this.load.audio('music', 'assets/music1.mp3');
         this.load.audio('flip', 'assets/retournement.mp3');
         this.load.audio('correct', 'assets/correct.mp3');
         this.load.audio('start', 'assets/game-start.mp3');
-        assets.forEach(([key, path]) => this.load.image(key, path));
     }
-    
+
     create() {
-        
         this.addBackground();
         this.addLogo();
         this.addButtons();
         this.addPopup();
         this.addSettingsWindow();
 
-            music = this.sound.add('music', {loop : true, volume : 0});
-            flip = this.sound.add('flip', {volume : 0.5});
-            correct = this.sound.add('correct', {volume : 0.5});
-            start = this.sound.add('start', { volume : 0.2});
+        // Add sounds
+        music = this.sound.add('music', { loop: true, volume: 0 });
+        flip = this.sound.add('flip', { volume: 0.5 });
+        correct = this.sound.add('correct', { volume: 0.5 });
+        start = this.sound.add('start', { volume: 0.2 });
 
-            console.log(music, flip, start, correct)
-            
-            
-            if(playMusic){
-                music.play()
-            }
-        
+        if (playMusic) music.play();
 
+        // Animate logo
         this.tweens.add({
             targets: this.Logo,
-            scale: 1.3, // La taille à atteindre (1.2 fois plus grand)
-            ease: 'Sine.easeInOut', // Type d'animation pour l'effet pulsant
-            duration: 800, // Durée de l'animation en ms
-            yoyo: true, // Revenir à la taille initiale
-            repeat: -1, // Répéter indéfiniment
+            scale: 1.3,
+            ease: 'Sine.easeInOut',
+            duration: 800,
+            yoyo: true,
+            repeat: -1,
         });
-
-    
     }
 
     addBackground() {
-        this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'background')
-            .setOrigin(0.5, 0.5)
-            // .setDisplaySize(this.cameras.main.width, this.cameras.main.height);
+        this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'background').setOrigin(0.5);
     }
 
     addLogo() {
-        this.Logo = this.add.image(this.cameras.main.width / 2, this.cameras.main.height * 3 / 10, 'Logo');
+        this.Logo = this.add.image(this.cameras.main.width / 2, this.cameras.main.height * 0.3, 'Logo');
     }
 
     addButtons() {
-        this.startButton = this.createButton('startButton', this.cameras.main.height * 5 / 7, this.startGame.bind(this)).setScale(0.9);
-        // this.settingButton = this.createButton('settingButton', this.cameras.main.height * 4.8 / 7, this.showSettings.bind(this));
+        this.createButton('startButton', this.cameras.main.height * 5 / 7, this.startGame.bind(this)).setScale(0.9);
     }
 
     createButton(key, y, callback) {
@@ -100,18 +90,21 @@ class StartScene extends Phaser.Scene {
 
     addPopup() {
         this.popupAccueil = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'popupAccueil')
-        .setOrigin(0.5, 0.5)
-        .setDisplaySize(this.cameras.main.width, this.cameras.main.height)
-        .setInteractive();
-        this.popupAccueil.scale = 0;
-        this.windowMenu.push(this.popupAccueil)
+            .setOrigin(0.5)
+            .setDisplaySize(this.cameras.main.width, this.cameras.main.height)
+            .setInteractive()
+            .setScale(0);
+
+        this.windowMenu.push(this.popupAccueil);
         this.popupAccueil.on('pointerdown', this.hidePopup.bind(this));
     }
 
     addSettingsWindow() {
-        this.settingWindow = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'settingWindow').setInteractive();
-        this.settingWindow.scale = 0;
-        this.windowMenu.push(this.settingWindow)
+        this.settingWindow = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'settingWindow')
+            .setInteractive()
+            .setScale(0);
+
+        this.windowMenu.push(this.settingWindow);
         this.addSettingsControls();
     }
 
@@ -126,9 +119,8 @@ class StartScene extends Phaser.Scene {
         ];
 
         controls.forEach(({ key, x, y, toggle }) => {
-            const image = this.add.image(x, y, key).setInteractive();
-            image.scale = 0;
-            this.windowMenu.push(image)
+            const image = this.add.image(x, y, key).setInteractive().setScale(0);
+            this.windowMenu.push(image);
             if (toggle) {
                 image.on('pointerdown', () => this.toggleImage(image));
             } else {
@@ -142,75 +134,45 @@ class StartScene extends Phaser.Scene {
     }
 
     showSettings() {
-        // if(playMusic){
-        //     music.pause()
-        //     playMusic = false
-        // }
-        // else{
-        //     music.play()
-        //     playMusic = true
-        // }
-
-        
-        this.tweens.add({
-            targets: this.settingButton ,
-            scaleX: 0.9,
-            scaleY: 0.9,
-            duration: 100,
-            onComplete: () => {
-                this.tweens.add({
-                    targets: this.settingButton,
-                    scaleX: 1,
-                    scaleY: 1,
-                    duration: 100,
-                    onComplete: () => {
-                        this.tweens.add({
-                            targets: this.windowMenu,
-                            scale: 1,
-                            duration: 75
-                        });
-                    }
-                });
-            }
+        this.animateButton(this.settingButton, () => {
+            this.tweens.add({ targets: this.windowMenu, scale: 1, duration: 75 });
         });
     }
 
     hidePopup() {
-        this.tweens.add({
-            targets: this.windowMenu,
-            scale: 0,
-            duration: 75
-        });
+        this.tweens.add({ targets: this.windowMenu, scale: 0, duration: 75 });
     }
 
     startGame() {
+        this.animateButton(this.startButton, () => {
+            this.cameras.main.fadeOut(500, 0, 0, 0);
+            this.scene.transition({
+                target: "LevelSelectScene",
+                duration: 1000,
+                moveAbove: true,
+            });
+        });
+    }
+
+    animateButton(button, onComplete) {
         this.tweens.add({
-            targets: this.startButton,
+            targets: button,
             scaleX: 0.9,
             scaleY: 0.9,
             duration: 100,
             onComplete: () => {
                 this.tweens.add({
-                    targets: this.startButton,
+                    targets: button,
                     scaleX: 1,
                     scaleY: 1,
                     duration: 100,
-                    onComplete: () => {
-                        this.cameras.main.fadeOut(500, 0, 0, 0);
-                        this.scene.transition({
-                            target: "TypesScene",
-                            duration: 1000,
-                            moveAbove: true,
-                            onUpdate: (progress) => {
-                                this.cameras.main.x = 800 * progress;
-                            }
-                        });
-                    }
+                    onComplete
                 });
             }
         });
     }
 }
+
 
 
 
@@ -292,6 +254,7 @@ class GameScene extends Phaser.Scene {
     
     
     create() {
+        this.cameras.main.fadeIn(500, 0, 0, 0);
         this.timeLeft = levelTime; // Temps initial en secondes
 
         // Ajouter l'image de fond, centrée
@@ -342,16 +305,16 @@ class GameScene extends Phaser.Scene {
         this.clock_progression = this.add.image(centerX - 94, this.cameras.main.height / 7, "Clock_progression_bar").setInteractive().setOrigin(0, 0.5);
 
         // Création des étoiles
-        const stars = [
-            { x: centerX - 80, y: centerY - 80 },
-            { x: centerX, y: centerY - 115 },
-            { x: centerX + 80, y: centerY - 80 },
-        ];
-        
-        stars.forEach((pos, index) => {
-            this[`star${index + 1}`] = this.createStar(pos.x, pos.y, "star", 100);
-            this[`star${index + 1}_success`] = this.createStar(pos.x, pos.y, "star_success", 101);
-        });
+            const stars = [
+                { x: centerX - 80, y: centerY - 80 },
+                { x: centerX, y: centerY - 115 },
+                { x: centerX + 80, y: centerY - 80 },
+            ];
+            
+            stars.forEach((pos, index) => {
+                this[`star${index + 1}`] = this.createStar(pos.x, pos.y, "star", 100);
+                this[`star${index + 1}_success`] = this.createStar(pos.x, pos.y, "star_success", 101);
+            });
 
         // Gestion des événements pour les boutons
         this.replay.on('pointerdown', () => this.Replaygame());
@@ -610,7 +573,7 @@ class GameScene extends Phaser.Scene {
                                     this.tweens.add({
                                         targets: [this.firstCard, this.secondCard],
                                         scale: gridConfig.scale,
-                                        duration: 200,
+                                        duration: 100,
                                         onComplete: () => {
                                             this.resetCards();      
                                         }
@@ -633,10 +596,18 @@ class GameScene extends Phaser.Scene {
     
     checkForWin() {
         if (this.cards.length === 0) {
+            starNote = this.timeLeft / levelTime
             this.timerEvent.remove(); // Arrêter la minuterie
     
             // Animation de succès
-            this.animateSuccessUI();
+            // this.animateSuccessUI();
+            passed = true;
+            this.cameras.main.fadeOut(500, 0, 0, 0);
+            this.scene.transition({
+                target: "SuccessScene",
+                duration: 500,
+                // moveAbove: true,
+            });
     
             let currentLevelUnlocked = localStorage.getItem('currentLevel');
             if (currentLevelUnlocked == gridConfig.level) {
@@ -684,373 +655,64 @@ class GameScene extends Phaser.Scene {
     
 
     update() {
-        // Optionnel: Réinitialiser les cartes non sélectionnées
-        if (!this.secondCard && !this.firstCard) {
+        // Réinitialisation des cartes visibles après une mauvaise correspondance
+        if (!this.firstCard && !this.secondCard) {
             this.cards.forEach(card => card.setTexture('dos'));
         }
-
-        // this.timeText.setText(`Time: ${this.timeLeft}`);
-
-        this.clock_progression.scaleX = this.timeLeft/levelTime
-        // // Vérifier si le temps est écoulé
+    
+        // Mettre à jour la barre de progression du temps
+        this.clock_progression.scaleX = this.timeLeft / levelTime;
+    
+        // Si le temps est écoulé, terminer le jeu
         if (this.timeLeft <= 0) {
             this.endGame(); // Appeler la méthode de fin de jeu
         }
     }
-
+    
     updateTime() {
-       if(play){
-        if (this.timeLeft > 0) {
-            this.timeLeft -= 1/1000;
-            this.cards.map((card) =>{
-                card.setVisible(true)
-            })
+        if (play && this.timeLeft > 0) {
+            this.timeLeft -= 1 / 1000;
+    
+            // Rendre les cartes visibles si le jeu est en cours
+            // this.cards.forEach(card => card.setVisible(true));
+        } else {
+            // Optionnel: gestion lorsque le jeu est en pause
+            // this.cards.forEach(card => card.setVisible(false));
         }
-       }
-       else{
-        this.cards.map((card) =>{
-            // card.setVisible(false)
-        })
-       }
-
     }
-
+    
     endGame() {
-        this.timerEvent.remove(); // Arrêter la minuterie
-        console.log("Temps écoulé !"); // Afficher un message ou une scène de fin de jeu
-
-        this.cards.map((card) =>{
-            card.setVisible(false)
-        })
-
-        this.tweens.add({
-            targets: [this.pauseInterface, this.replay, this.reesayer, this.home, this.pauseButton, this.clock_progression, this.music, this.sound, this.clock],
-            scale: 0,
-            duration: 10,
-            onComplete: () =>{
-                this.tweens.add({
-                    targets: [this.pauseInterface],
-                    scale: 0,
-                    duration: 500,
-                    onComplete: () =>{
-                        this.tweens.add({
-                            targets: [this.failedInterface, this.star1, this.star2, this.star3],
-                            scale: 1,
-                            duration: 100,
-                        });
-                    }
-                });
-            }
-        });
-        
-    }
-    // Activation de la qualité de l'image
-    
-}
-
-
-class TypesScene extends Phaser.Scene {
-    
-    constructor() {
-        super({ key: 'TypesScene' });
-        this.setScale = false; // Initialize the scaling direction
-    }
-    
-    preload() {
-        // Preload all assets
-        //this.load.image('cochon', `assets/animals/cochon.png`);
-        const assets = {
-            // 'background_types': 'assets/Types.png',
-            'background_types': 'Accueil_background',
-            'Grid_entete': 'assets/entete.png',
-            'return': 'assets/Next.png',
-            'Type_entete': 'assets/Type.png',
-            'game_background': 'Accueil_background.jfif',
-            'Fruits': 'assets/Types/Fruits.png',
-            'Animals': 'assets/Types/Animals.png',
-            'Vegetables': 'assets/Types/Vegetables.png',
-            'Home': 'assets/Home.png'
-        };
-        
-        for (const [key, path] of Object.entries(assets)) {
-            this.load.image(key, path);
-        }
-    }
-    
-    create() {
-        // Set up background and UI elements
-        this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'game_background')
-        .setOrigin(0.5, 0.5)
-        
-        const graphics = this.add.graphics();
-        graphics.fillStyle(0xd9d9d9, 0.25);
-        graphics.fillRect(0, 0, this.cameras.main.width, 100);
-        
-        this.add.text(this.cameras.main.width / 2, 30, 'Categories', { 
-            fontSize: '50px', 
-            fill: '#FFA800', 
-            fontStyle: 'bold', 
-            fontFamily: 'Rubik'  // Ajoutez ici le font-family souhaité
-        }).setOrigin(0.5, 0);
-        
-        
-        this.retour = this.add.image(20, 30, 'return').setOrigin(0, 0).setInteractive();
-        this.retour.scale = 0.8
-        
-        // this.retour = this.add.image(0,0, 'Type_entete').setOrigin(0, 0).setInteractive().setDisplaySize(this.cameras.main.width, 100);
-        
-        this.section_types = [
-            { key: 'Fruits', x: this.cameras.main.width *1.5/6, y: 0.35 },
-            { key: 'Animals', x: this.cameras.main.width*4.5/6, y: 0.35 },
-            { key: 'Vegetables', x: this.cameras.main.width/2, y: 0.625 }
-        ];
-        
-        this.section_types.forEach(section => {
-            section.name = this.add.image(section.x, this.cameras.main.height * section.y, section.key).setInteractive();
-            section.name.on('pointerdown', () => this.onSectionClick(section));
-        });
-        
-        //this.add.image(this.cameras.main.width / 2, this.cameras.main.height /2, 'cochon').setOrigin(0.5, 0.5).setScale(2)
-
-        this.retour.on('pointerdown', () => {
+        // Arrêter la minuterie
+        this.timerEvent.remove();
+        passed = false
+        this.cameras.main.fadeOut(500, 0, 0, 0);
             this.scene.transition({
-                target: 'StartScene',
-                duration: 1000,
-                moveAbove: true,
-                moveBelow: false,
-                onUpdate: (progress) => {
-                    this.cameras.main.x = 800 * progress;
-                }
+                target: "SuccessScene",
+                duration: 500,
+                // moveAbove: true,
             });
-        });
-
-        
-        
-        this.animation()
-    }
-
-    animation() {
-        this.section_types.forEach(section => {
-            // console.log(section)
-            // this.tweens.add({
-            //     targets: section.name,
-            //     scale: 1.1, // La taille à atteindre (1.2 fois plus grand) // La taille à atteindre (1.2 fois plus grand)
-            //     ease: 'Sine.easeInOut', // Type d'animation pour l'effet pulsant
-            //     duration: 500, // Durée de l'animation en ms
-            //     yoyo: true, // Revenir à la taille initiale
-            //     repeat: -1, // Répéter indéfiniment
-            // });
-        });
-    }
+        console.log("Temps écoulé !");
     
+        // Masquer toutes les cartes
+    //     this.cards.forEach(card => card.setVisible(false));
     
-    onSectionClick(section) {
-        this.tweens.add({
-            targets: section.name,
-            scaleX: 0.9,
-            scaleY: 0.9,
-            duration: 100,
-            onComplete: () => {
-                this.tweens.add({
-                    targets: section.name,
-                    scaleX: 1,
-                    scaleY: 1,
-                    duration: 100,
-                    onComplete: () => {
-                        this.scene.transition({
-                            target: "LevelSelectScene",
-                            duration: 1000,
-                            moveAbove: true,
-                            moveBelow: false,
-                            onUpdate: (progress) => {
-                                this.cameras.main.x = 800 * progress;
-                            }
-                        });
-                    }
-                });
-            }
-        });
-    }
+    //     // Tweens pour masquer les éléments de l'interface et afficher l'écran de fin
+    //     this.tweens.add({
+    //         targets: [this.pauseInterface, this.replay, this.reesayer, this.home, this.pauseButton, this.clock_progression, this.music, this.sound, this.clock],
+    //         scale: 0,
+    //         duration: 100, // Temps raisonnable pour l'animation
+    //         onComplete: () => {
+    //             // Afficher l'interface de fin
+    //             this.tweens.add({
+    //                 targets: [this.failedInterface, this.star1, this.star2, this.star3],
+    //                 scale: 1,
+    //                 duration: 200
+    //             });
+    //         }
+    //     });
+     }    
     
-    update() {
-        
-    }
 }
-
-
-class GridScene extends Phaser.Scene {
-    constructor() {
-        super({ key: 'GridScene' });
-    }
-    
-    preload() {
-        this.load.image('game_background', 'assets/Game_interface.png');
-        this.load.image('grid_component', 'assets/Frame 48 (2).png');
-        this.load.image('next_slide', 'assets/Next_slide.png');
-        this.load.image('prev_slide', 'assets/Prev_slide.png');
-        this.load.image('return', 'assets/return.png');
-    }
-    
-    create() {
-        // Liste des grilles
-        const gridList = [
-            { id: 0, row: 2, col: 2 },
-            { id: 1, row: 2, col: 3 },
-            { id: 2, row: 2, col: 4 },
-            { id: 3, row: 2, col: 5 },
-            { id: 4, row: 2, col: 6 },
-            { id: 5, row: 2, col: 7 },
-            { id: 6, row: 3, col: 4 },
-            { id: 7, row: 3, col: 6 },
-            { id: 8, row: 4, col: 4 },
-            { id: 9, row: 4, col: 5 },
-            { id: 10, row: 4, col: 6 },
-            { id: 11, row: 4, col: 7 },
-            { id: 12, row: 5, col: 6 },
-        ];
-        
-        this.gridContainer = [[], [], [], []];
-        this.arrowVisible = 0;
-        
-        // Ajouter les éléments de l'interface
-        this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'game_background')
-        .setOrigin(0.5, 0.5)
-        // .setDisplaySize(this.cameras.main.width, this.cameras.main.height);
-        
-        const graphics = this.add.graphics();
-        graphics.fillStyle(0xffffff, 0.5);
-        graphics.fillRect(0, 0, this.cameras.main.width, 100);
-        this.add.text(this.cameras.main.width / 2, 30, 'Grids', { 
-            fontSize: '40px', 
-            fill: '#FFE728', 
-            fontStyle: 'bold', 
-            fontFamily: 'Rubik'  // Ajoutez ici le font-family souhaité
-        }).setOrigin(0.5, 0);
-        this.return = this.add.image(20, 20, 'return').setOrigin(0, 0).setInteractive();
-        
-        this.nextSlide = this.add.image(this.cameras.main.width * 9 / 10, this.cameras.main.height / 2, 'next_slide').setInteractive();
-        this.prevSlide = this.add.image(this.cameras.main.width * 1 / 10, this.cameras.main.height / 2, 'prev_slide').setInteractive();
-        
-        this.prevSlide.setDepth(10);
-        this.nextSlide.setDepth(10);
-        
-        this.return.on('pointerdown', () => {
-            this.scene.transition({
-                target: 'TypesScene',
-                duration: 1000,
-                moveAbove: true,
-                moveBelow: false,
-                onUpdate: (progress) => {
-                    this.cameras.main.x = 800 * progress;
-                }
-            });
-        });
-        
-        // Créer les composants de grille
-        gridList.forEach(grid => {
-            const gridImage = this.add.image(
-                this.cameras.main.width / 2 + this.cameras.main.width * Math.floor(grid.id / 3),
-                this.cameras.main.height * 35 / 100 + 100 * (grid.id % 3),
-                'grid_component'
-                ).setInteractive();
-                
-                const gridText = this.add.text(
-                    this.cameras.main.width / 2 + this.cameras.main.width * Math.floor(grid.id / 3),
-                    this.cameras.main.height * 35 / 100 - 7 + 100 * (grid.id % 3) + 10,
-                    `${grid.row} x ${grid.col}`,
-                    { fontSize: '25px', fill: '#fff', fontStyle: 'bold' }
-                    ).setOrigin(0.5, 0.5);
-                    
-                    gridImage.text = gridText;
-                    this.gridContainer[Math.floor(grid.id / 5)].push(gridImage);
-                    
-                    // Ajouter les interactions pour les images de grille
-                    gridImage.on('pointerdown', () => this.handleGridImageClick(grid, gridImage, gridText));
-                });
-                
-                // Ajouter les interactions pour les flèches de navigation
-                this.prevSlide.on('pointerdown', () => {
-                    this.slideGrid(1);
-                    this.arrowVisible--;
-                });
-                
-                this.nextSlide.on('pointerdown', () => {
-                    this.slideGrid(-1);
-                    this.arrowVisible++;
-                });
-            }
-            
-            handleGridImageClick(grid, gridImage, gridText) {
-                gridConfig.rows = grid.row;
-                gridConfig.cols = grid.col;
-                
-                gridConfig.scale = Math.min(
-                    (this.cameras.main.width - 20 - 10 * (grid.row - 1)) / (gridConfig.cardWidth * grid.row),
-                    (this.cameras.main.height * 3 / 4 - 20 - 10 * (grid.col - 1)) / (gridConfig.cardWidth * grid.col)
-                    );
-                    
-                    this.tweens.add({
-                        targets: gridImage,
-                        scaleX: 0.9,
-                        scaleY: 0.9,
-                        duration: 100,
-                        onComplete: () => {
-                            this.tweens.add({
-                                targets: gridImage,
-                                scaleX: 1,
-                                scaleY: 1,
-                                duration: 100,
-                });
-            }
-        });
-        
-        this.tweens.add({
-            targets: gridText,
-            scaleX: 0.9,
-            scaleY: 0.9,
-            duration: 100,
-            onComplete: () => {
-                this.tweens.add({
-                    targets: gridText,
-                    scaleX: 1,
-                    scaleY: 1,
-                    duration: 100,
-                    onComplete: () => {
-                        this.scene.transition({
-                            target: 'GameScene',
-                            duration: 1000,
-                            moveAbove: true,
-                            moveBelow: false,
-                            onUpdate: (progress) => {
-                                this.cameras.main.x = 800 * progress;
-                            }
-                        });
-                    }
-                });
-            }
-        });
-    }
-    
-    slideGrid(direction) {
-        this.gridContainer.forEach(gridTable => {
-            gridTable.forEach(gridLi => {
-                this.tweens.add({
-                    targets: [gridLi, gridLi.text],
-                    x: gridLi.x + this.cameras.main.width * direction,
-                    duration: 500,
-                });
-            });
-        });
-    }
-    
-    update() {
-        this.prevSlide.setVisible(this.arrowVisible > 0);
-        this.nextSlide.setVisible(this.arrowVisible < 3);
-    }
-}
-
-
-
 const LevelList = [
     { "level": 1, "row": 2, "col": 2, "time": 10 },
     { "level": 2, "row": 2, "col": 3, "time": 18},
@@ -1082,6 +744,8 @@ class LevelSelectScene extends Phaser.Scene {
     }
     
     create() {
+        this.cameras.main.fadeIn(500, 0, 0, 0);
+
         // Ajouter le fond d'écran de la scène de sélection des niveaux
         this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'level_background')
             .setOrigin(0.5)
@@ -1186,12 +850,161 @@ class LevelSelectScene extends Phaser.Scene {
             moveAbove: true,
         });
     }
-
+    
     update() {
         // Mettre à jour l'interface utilisateur si nécessaire
     }
 }
 
+
+class SuccessScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'SuccessScene' });
+        
+    }
+    
+    preload() {
+        const basePath = 'assets/Game/';
+        
+        // Charger les images communes
+        const images = [
+            { key: 'Home', path: `${basePath}Home.png` },
+            { key: 'réessayer_bouton', path: `${basePath}réessayer_bouton.png` },
+            { key: 'game_background', path: 'Accueil_background.jfif' },
+            { key: 'success_interface', path: `${basePath}success_interface.png` },
+            { key: 'failed_interface', path: `${basePath}failed_interface.png` },
+            { key: 'star', path: `${basePath}star.png` },
+            { key: 'star_success', path: `${basePath}star_success.png` },
+            { key: 'Next_level', path: `${basePath}Next_level.png` }
+        ];
+        
+        // Charger toutes les images dans la boucle
+        images.forEach(img => this.load.image(img.key, img.path));
+        
+    }
+    
+    create() {
+        this.cameras.main.fadeIn(1000, 0, 0, 0);
+        
+        this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'game_background').setOrigin(0.5);
+
+
+        const centerX = this.cameras.main.width/2
+        const centerY = this.cameras.main.height/2
+
+        this.home = this.add.image(this.cameras.main.width / 4, this.cameras.main.height / 2 + 100, 'Home').setDepth(105).setInteractive()
+        this.reesayer = this.add.image(this.cameras.main.width *3/ 4, this.cameras.main.height / 2 + 100, 'réessayer_bouton').setDepth(105).setScale(0).setInteractive()
+        this.NextLevel = this.add.image(this.cameras.main.width *3/ 4, this.cameras.main.height / 2 + 100, 'Next_level').setDepth(105).setScale(0).setInteractive()
+
+        this.successInterface = this.createInterface(centerX, centerY, 'success_interface', 99, 0);
+        this.failedInterface = this.createInterface(centerX, centerY, 'failed_interface', 99, 0);
+
+        const stars = [
+            { x: centerX - 80, y: centerY - 80 },
+            { x: centerX, y: centerY - 115 },
+            { x: centerX + 80, y: centerY - 80 },
+        ];
+        
+        stars.forEach((pos, index) => {
+            this[`star${index + 1}`] = this.createStar(pos.x, pos.y, "star", 100);
+            this[`star${index + 1}_success`] = this.createStar(pos.x, pos.y, "star_success", 101);
+        });
+
+        if(passed){
+            this.interface = this.successInterface.setScale(1)
+            this.NextLevel.setScale(1)
+            this.animateSuccessUI()
+        }else{
+            this.interface = this.failedInterface.setScale(0)
+            this.reesayer.setScale(1)
+            this.animateSuccessUI()
+        }
+
+
+        this.home.on('pointerdown', () =>{
+            this.cameras.main.fadeOut(500, 0, 0, 0);
+            this.scene.transition({
+                target: "StartScene",
+                duration: 500,
+                moveAbove: true,
+            });
+        })
+
+        this.reesayer.on('pointerdown', () =>{
+            this.cameras.main.fadeOut(500, 0, 0, 0);
+            this.scene.transition({
+                target: 'GameScene',
+                duration: 500,
+                moveAbove: true,
+            });
+        })
+
+        this.NextLevel.on('pointerdown', () =>{
+            this.cameras.main.fadeOut(500, 0, 0, 0);
+            this.scene.transition({
+                target: 'GameScene',
+                duration: 500,
+                moveAbove: true,
+            });
+        })
+
+    }
+
+
+    createStar(x, y, texture, depth, scale = 0) {
+        return this.add.image(x, y, texture)
+            .setOrigin(0.5, 0.5)
+            .setDepth(depth)
+            .setScale(scale);
+    }
+
+    createInterface(x, y, texture, depth, scale = 1) {
+        return this.add.image(x, y, texture)
+            .setInteractive()
+            .setDepth(depth)
+            .setScale(scale);
+    }
+
+    animateSuccessUI() {
+                this.tweens.add({
+                    targets: [this.interface, this.star1, this.star2, this.star3],
+                    scale: 1,
+                    duration: 100,
+                    onComplete: () => {
+                        if(passed){
+                            this.animateStarsSuccess();
+                        }
+                    }
+                });
+    }
+    
+    animateStarsSuccess() {
+        let starTweens = [
+            { target: this.star1_success, delay: 300 },
+            { target: this.star2_success, delay: 800 },
+            { target: this.star3_success, delay: 1300 }
+        ];
+
+        if(starNote < 0.15) {
+            starTweens = starTweens.slice(0,1) 
+        }else if(starNote < 0.40){
+            starTweens = starTweens.slice(0,2) 
+        }
+         
+        starTweens.forEach(({ target, delay }) => {
+            this.tweens.add({
+                targets: target,
+                scale: 1,
+                duration: 400,
+                delay
+            });
+        });
+    }
+
+    update() {
+        // Mettre à jour l'interface utilisateur si nécessaire
+    }
+}
 
 
 
@@ -1214,7 +1027,7 @@ const config = {
     scale: {
         mode: Phaser.Scale.FIT,
     },
-    scene: [StartScene, GameScene, TypesScene, GridScene, LevelSelectScene]
+    scene: [StartScene, GameScene, SuccessScene, LevelSelectScene]
 };
 const game = new Phaser.Game(config);
 
