@@ -25,7 +25,6 @@ export class LevelSelectScene extends Phaser.Scene {
         // Ajouter le fond d'écran de la scène de sélection des niveaux
         this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'level_background')
             .setOrigin(0.5)
-            // .setDisplaySize(this.cameras.main.width, this.cameras.main.height);
 
         // Créer l'interface utilisateur pour sélectionner les niveaux
         this.createLevelGrid();
