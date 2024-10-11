@@ -15,7 +15,7 @@ export class LevelSelectScene extends Phaser.Scene {
         this.load.image('level_card', '../../assets/images/Levels/Level.png');
         this.load.image('locked_level', '../../assets/images/Levels/Lock.png');
         this.load.image('return', '../../assets/images/Next.png');
-        this.load.image('starBar', '../../assets/images/Levels/starBar.png');
+        this.load.image('starBar', '../../assets/images/Levels/StarBar.png');
         this.load.image('starLevel', '../../assets/images/Levels/starLevel.png');
     }
     
