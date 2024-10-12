@@ -107,7 +107,10 @@ export class GameScene extends Phaser.Scene {
 
         // Création des boutons de son et musique
         this.sound = this.createIconButton(this.cameras.main.width/2 + 80, 10, "sound_on", () => this.toggleSound());
+        this.sound.setTexture(gameState.playSound ? "sound_on" : "sound_off");
+
         this.music = this.createIconButton(this.cameras.main.width/2 + 140, 10, "music_on", () => this.toggleMusic());
+        this.music.setTexture(gameState.playMusic ? "music_on" : "music_off");
 
         // Pause et autres interfaces
         this.pauseButton = this.createIconButton(10, 10, "Pause_button", () => this.PauseMenu());
@@ -205,6 +208,7 @@ export class GameScene extends Phaser.Scene {
 
     // Redémarrer le jeu
     restartGame() {
+        this.resetCards()
         gameState.play = true;
         this.tweens.add({
             targets: [this.pauseInterface, this.replay, this.reesayer, this.home],
@@ -358,12 +362,14 @@ export class GameScene extends Phaser.Scene {
                     this.tweens.add({
                         targets: [this.firstCard, this.secondCard],
                         scale: 0,
-                        duration: 200,
-                        onComplete: () => {
-                            this.cards = this.cards.filter(card => card !== this.firstCard && card !== this.secondCard);
-                            this.pairsLeft--
-                            this.checkForWin();
-                            this.resetCards();
+                        // onStart : () =>{
+                            // },
+                            duration: 100,
+                            onComplete: () => {
+                                this.cards = this.cards.filter(card => card !== this.firstCard && card !== this.secondCard);
+                                this.pairsLeft--
+                                this.resetCards();
+                                this.checkForWin();
                         }
                     });
                 } else  {
@@ -387,7 +393,7 @@ export class GameScene extends Phaser.Scene {
                                     this.tweens.add({
                                         targets: [this.firstCard, this.secondCard],
                                         scale: gridConfig.scale,
-                                        duration: 100,
+                                        duration: 10,
                                         onComplete: () => {
                                             this.resetCards();      
                                         }
