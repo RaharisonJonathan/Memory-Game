@@ -11,7 +11,9 @@ const gameState = {
     music: null,
     flip: null,
     correct: null,
-    start: null
+    start: null,
+    success : null,
+    fail: null,
 };
 
 // Sauvegarder le niveau actuel dans le localStorage au début

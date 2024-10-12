@@ -16,7 +16,7 @@ class ResultScene extends Phaser.Scene {
         const images = [
             { key: 'Home', path: `${basePath}Home.png` },
             { key: 'réessayer_bouton', path: `${basePath}réessayer_bouton.png` },
-            { key: 'game_background', path: '../../Accueil_background.jfif' },
+            { key: 'game_background', path: '../../assets/images/Accueil_background.jfif' },
             { key: 'success_interface', path: `${basePath}success_interface.png` },
             { key: 'failed_interface', path: `${basePath}failed_interface.png` },
             { key: 'star', path: `${basePath}star.png` },
@@ -65,9 +65,12 @@ class ResultScene extends Phaser.Scene {
             this.reesayer.setScale(1)
             this.animateSuccessUI()
         }
-
-
+        
+        
         this.home.on('pointerdown', () =>{
+            gameState.success.stop()
+            gameState.music.stop();
+            gameState.fail.stop()
             this.cameras.main.fadeOut(500, 0, 0, 0);
             this.scene.transition({
                 target: "StartScene",
@@ -75,8 +78,10 @@ class ResultScene extends Phaser.Scene {
                 moveAbove: true,
             });
         })
-
+        
         this.reesayer.on('pointerdown', () =>{
+            gameState.fail.stop()
+            gameState.success.stop()
             this.cameras.main.fadeOut(500, 0, 0, 0);
             this.scene.transition({
                 target: 'GameScene',
@@ -86,6 +91,7 @@ class ResultScene extends Phaser.Scene {
         })
 
         this.NextLevel.on('pointerdown', () =>{
+            gameState.success.pause()
             gameState.LevelActually
             gridConfig.rows = LevelList[gameState.LevelActually].row;
             gridConfig.cols = LevelList[gameState.LevelActually].col;
@@ -122,19 +128,26 @@ class ResultScene extends Phaser.Scene {
     }
 
     animateSuccessUI() {
-                this.tweens.add({
-                    targets: [this.interface, this.star1, this.star2, this.star3],
-                    scale: 1,
-                    duration: 100,
-                    onComplete: () => {
-                        if(gameState.passed){
-                            this.animateStarsSuccess();
+        this.tweens.add({
+            targets: [this.interface, this.star1, this.star2, this.star3],
+            scale: 1,
+            duration: 100,
+            onComplete: () => {
+                        if(gameState.playSound){
+                            if(gameState.passed){
+                                gameState.success.play()
+                                this.animateStarsSuccess();
+                            }
+                            else{
+                                gameState.fail.play()
+                            }
                         }
                     }
                 });
     }
     
     animateStarsSuccess() {
+        
         let starTweens = [
             { target: this.star1_success, delay: 300 },
             { target: this.star2_success, delay: 800 },

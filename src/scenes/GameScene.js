@@ -9,8 +9,7 @@ const Data = [
     { key: 'zèbre' }, { key: 'panda' },
     { key: 'vache' }, { key: 'mouton' },
     { key: 'cheval' }, { key: 'cochon' },
-    { key: 'poulet' },
-    { key: 'chèvre' }, { key: 'lapin' },
+    { key: 'poulet' },, { key: 'lapin' },
     { key: 'chien' }, { key: 'chat' },
     { key: 'dauphin' }, { key: 'tortue' },
     { key: 'crabe' },
@@ -32,8 +31,8 @@ export class GameScene extends Phaser.Scene {
         this.firstCard = null;
         this.secondCard = null;
         this.canFlip = true;
-        this.timeText = null; // Texte pour afficher le temps
-        this.timerEvent = null; // Événement de minuterie
+        this.timeText = null; 
+        this.timerEvent = null; 
     }
 
     preload() {
@@ -41,7 +40,7 @@ export class GameScene extends Phaser.Scene {
         
         // Charger les images communes
         const images = [
-            { key: 'game_background', path: '../../Accueil_background.jfif' },
+            { key: 'game_background', path: '../../assets/images/Accueil_background.jfif' },
             { key: 'dos', path: `${basePath}back_card.png` },
             { key: 'music_off', path: `${basePath}music_off.png` },
             { key: 'music_on', path: `${basePath}music_on.png` },
@@ -362,8 +361,6 @@ export class GameScene extends Phaser.Scene {
                     this.tweens.add({
                         targets: [this.firstCard, this.secondCard],
                         scale: 0,
-                        // onStart : () =>{
-                            // },
                             duration: 100,
                             onComplete: () => {
                                 this.cards = this.cards.filter(card => card !== this.firstCard && card !== this.secondCard);
@@ -418,10 +415,7 @@ export class GameScene extends Phaser.Scene {
         if (this.cards.length === 0) {
             this.resetCards()
             gameState.starNote = this.timeLeft / gameState.levelTime
-            this.timerEvent.remove(); // Arrêter la minuterie
-    
-            // Animation de succès
-            // this.animateSuccessUI();
+            this.timerEvent.remove();
             gameState.passed = true;
             this.cameras.main.fadeOut(500, 0, 0, 0);
             this.scene.transition({
@@ -486,19 +480,13 @@ export class GameScene extends Phaser.Scene {
     
         // Si le temps est écoulé, terminer le jeu
         if (this.timeLeft <= 0) {
-            this.endGame(); // Appeler la méthode de fin de jeu
+            this.endGame();
         }
     }
     
     updateTime() {
         if (gameState.play && this.timeLeft > 0) {
             this.timeLeft -= 1 / 1000;
-    
-            // Rendre les cartes visibles si le jeu est en cours
-            // this.cards.forEach(card => card.setVisible(true));
-        } else {
-            // Optionnel: gestion lorsque le jeu est en pause
-            // this.cards.forEach(card => card.setVisible(false));
         }
     }
     
@@ -511,27 +499,9 @@ export class GameScene extends Phaser.Scene {
             this.scene.transition({
                 target: "ResultScene",
                 duration: 500,
-                // moveAbove: true,
             });
         console.log("Temps écoulé !");
     
-        // Masquer toutes les cartes
-    //     this.cards.forEach(card => card.setVisible(false));
-    
-    //     // Tweens pour masquer les éléments de l'interface et afficher l'écran de fin
-    //     this.tweens.add({
-    //         targets: [this.pauseInterface, this.replay, this.reesayer, this.home, this.pauseButton, this.clock_progression, this.music, this.sound, this.clock],
-    //         scale: 0,
-    //         duration: 100, // Temps raisonnable pour l'animation
-    //         onComplete: () => {
-    //             // Afficher l'interface de fin
-    //             this.tweens.add({
-    //                 targets: [this.failedInterface, this.star1, this.star2, this.star3],
-    //                 scale: 1,
-    //                 duration: 200
-    //             });
-    //         }
-    //     });
      }    
     
 }

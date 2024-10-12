@@ -11,7 +11,7 @@ export class LevelSelectScene extends Phaser.Scene {
     
     preload() {
         // Charger les assets nécessaires
-        this.load.image('level_background', '../../Accueil_background.jfif');
+        this.load.image('level_background', '../../assets/images/Accueil_background.jfif');
         this.load.image('level_card', '../../assets/images/Levels/Level.png');
         this.load.image('locked_level', '../../assets/images/Levels/Lock.png');
         this.load.image('return', '../../assets/images/Next.png');
@@ -28,7 +28,6 @@ export class LevelSelectScene extends Phaser.Scene {
 
         // Créer l'interface utilisateur pour sélectionner les niveaux
         this.createLevelGrid();
-        // this.createBackButton();
 
         const graphics = this.add.graphics();
         graphics.fillStyle(0xd9d9d9, 0.25);
@@ -44,8 +43,9 @@ export class LevelSelectScene extends Phaser.Scene {
         
         this.retour = this.add.image(20, 30, 'return').setOrigin(0, 0).setInteractive()
         this.retour.scale = 0.8
-
+        
         this.retour.on('pointerdown', () =>{
+            gameState.music.stop()
             this.cameras.main.fadeOut(500, 0, 0, 0);
             this.scene.transition({
                 target: "StartScene",
@@ -94,11 +94,6 @@ export class LevelSelectScene extends Phaser.Scene {
                     this.add.text(x, y, `${levelIndex}`, { font: '50px Arial', color: '#ffffff' })
                         .setOrigin(0.5);
 
-                        // stars.forEach((pos, index) => {
-                        //     this[`star${index + 1}`] = this.createStar(pos.x, pos.y, "star", 100);
-                        //     this[`star${index + 1}_success`] = this.createStar(pos.x, pos.y, "star_success", 101,0);
-                        // });
-
                         this.add.image(x, y + 40, "starBar")
 
         
@@ -121,19 +116,6 @@ export class LevelSelectScene extends Phaser.Scene {
             // .setScale(scale);
     }
 
-    createBackButton() {
-        // Créer un bouton pour retourner à la scène d'accueil
-        const backButton = this.add.image(50, this.cameras.main.height - 50, 'back_button').setInteractive();
-        
-        backButton.on('pointerdown', () => {
-            this.cameras.main.fadeOut(500, 0, 0, 0);
-            this.scene.transition({
-                target: 'StartScene',
-                duration: 500
-            });
-        });
-    }
-
     unlockedLevels() {
         let unlockLevels = localStorage.getItem('currentLevel')
         // Retourner le nombre de niveaux débloqués (logique simplifiée ici)
@@ -153,18 +135,17 @@ export class LevelSelectScene extends Phaser.Scene {
             (this.cameras.main.height * 6.5 / 8 - 20 - 10 * (LevelList[gameState.LevelActually].col - 1)) / (gridConfig.cardWidth * LevelList[gameState.LevelActually].col)
             );
         
-
+            
+        gameState.music.stop()
         // Lancer la scène de jeu avec le niveau sélectionné
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.scene.transition({
             target: 'GameScene',
             duration: 500,
             moveAbove: true,
+            oncomplete : () => {
+            }
         });
-    }
-    
-    update() {
-        // Mettre à jour l'interface utilisateur si nécessaire
     }
 }
 

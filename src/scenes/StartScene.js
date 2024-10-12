@@ -8,27 +8,20 @@ export class StartScene extends Phaser.Scene {
 
     preload() {
         const assets = [
-            ['background', '../../Accueil_background.jfif'],
+            ['background', '../../assets/images/Accueil_background.jfif'],
             ['Logo', '../../assets/images/Accueil/Logo.png'],
             ['startButton', '../../assets/images/Accueil/start_button.png'],
-            ['settingButton', '../../assets/images/Accueil/Setting_button.svg'],
-            ['popupAccueil', '../../assets/images/Accueil/Popup_accueil.png'],
-            ['settingWindow', '../../assets/images/Accueil/setting_window.png'],
-            ['musicLabel', '../../assets/images/Accueil/music_label.png'],
-            ['soundLabel', '../../assets/images/Accueil/sound_label.png'],
-            ['okButton', '../../assets/images/Accueil/ok_button.png'],
-            ['cancelButton', '../../assets/images/Accueil/cancel_button.png'],
-            ['toggleOff', '../../assets/images/Accueil/toggle_off.png'],
-            ['toggleOn', '../../assets/images/Accueil/toggle_on.png']
         ];
 
         assets.forEach(([key, path]) => this.load.image(key, path));
 
         // Audio files
-        this.load.audio('music', '../../assets/audio/music1.mp3');
+        this.load.audio('music', '../../assets/audio/music.mp3');
         this.load.audio('flip', '../../assets/audio/retournement.mp3');
         this.load.audio('correct', '../../assets/audio/correct.mp3');
         this.load.audio('start', '../../assets/audio/game-start.mp3');
+        this.load.audio('success', '../../assets/audio/success.mp3');
+        this.load.audio('fail', '../../assets/audio/fail.mp3');
     }
 
     create() {
@@ -39,10 +32,12 @@ export class StartScene extends Phaser.Scene {
         this.addSettingsWindow();
 
         // Add sounds
-        gameState.music = this.sound.add('music', { loop: true, volume: 0 });
+        gameState.music = this.sound.add('music', { loop: true, volume: 0.2 });
         gameState.flip = this.sound.add('flip', { volume: 0.5 });
         gameState.correct = this.sound.add('correct', { volume: 0.5 });
-        gameState.start = this.sound.add('start', { volume: 0.2 });
+        gameState.start = this.sound.add('start', { volume: 0.5 });
+        gameState.success = this.sound.add('success', { volume: 1 });
+        gameState.fail = this.sound.add('fail', { volume: 1 });
 
         if (gameState.playMusic) gameState.music.play();
 
