@@ -73,6 +73,13 @@ export class LoadScene extends Phaser.Scene {
 
       
       Data.forEach(data => this.load.image(data.key, `${basePath}animals/${data.key}.png`));
+
+      this.load.image('level_card', '../../assets/images/Levels/Level.png');
+        this.load.image('locked_level', '../../assets/images/Levels/Lock.png');
+        this.load.image('return', '../../assets/images/Next.png');
+        this.load.image('starBar', '../../assets/images/Levels/StarBar.png');
+        this.load.image('starLevel', '../../assets/images/Levels/starLevel.png');
+        this.load.image('Reset', '../../assets/images/Levels/Reset.png');
   
       //progression de la barre de chargement pendant le chargement 
       this.load.on('progress', (percent) => {

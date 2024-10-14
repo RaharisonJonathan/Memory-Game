@@ -9,16 +9,6 @@ export class LevelSelectScene extends Phaser.Scene {
         this.selectedLevel = null;
     }
     
-    preload() {
-        // Charger les assets nécessaires
-        this.load.image('level_background', '../../assets/images/Accueil_background.jfif');
-        this.load.image('level_card', '../../assets/images/Levels/Level.png');
-        this.load.image('locked_level', '../../assets/images/Levels/Lock.png');
-        this.load.image('return', '../../assets/images/Next.png');
-        this.load.image('starBar', '../../assets/images/Levels/StarBar.png');
-        this.load.image('starLevel', '../../assets/images/Levels/starLevel.png');
-    }
-    
     create() {
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
@@ -52,6 +42,16 @@ export class LevelSelectScene extends Phaser.Scene {
                 duration: 500,
                 moveAbove: true,
             });
+        })
+
+        this.Reset = this.add.image(this.cameras.main.width -10, 110, 'Reset').setOrigin(1, 0).setInteractive().on('pointerdown', () =>{
+            localStorage.setItem('currentLevel', 1);
+
+            for(let i = 1; i<= 12; i++){
+                LevelList[i-1].star = 0
+                localStorage.setItem(`level${i}`, 0)
+            }
+            this.scene.restart()
         })
     }
 
