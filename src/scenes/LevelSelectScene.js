@@ -23,7 +23,7 @@ export class LevelSelectScene extends Phaser.Scene {
         this.cameras.main.fadeIn(500, 0, 0, 0);
 
         // Ajouter le fond d'écran de la scène de sélection des niveaux
-        this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'level_background')
+        this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'background')
             .setOrigin(0.5)
 
         // Créer l'interface utilisateur pour sélectionner les niveaux
@@ -37,7 +37,7 @@ export class LevelSelectScene extends Phaser.Scene {
             fontSize: '50px', 
             fill: '#FFA800', 
             fontStyle: 'bold', 
-            fontFamily: 'Rubik'  // Ajoutez ici le font-family souhaité
+            fontFamily: 'Rubik'
         }).setOrigin(0.5, 0);
         
         
@@ -56,9 +56,8 @@ export class LevelSelectScene extends Phaser.Scene {
     }
 
     createLevelGrid() {
-        // Créer une grille de niveaux
-        const rows = 4; // Nombre de rangées de niveaux
-        const cols = 3; // Nombre de colonnes de niveaux
+        const rows = 4; 
+        const cols = 3; 
         
         const cardWidth = 80;
         const cardHeight = 80;
@@ -119,7 +118,7 @@ export class LevelSelectScene extends Phaser.Scene {
     unlockedLevels() {
         let unlockLevels = localStorage.getItem('currentLevel')
         // Retourner le nombre de niveaux débloqués (logique simplifiée ici)
-        return unlockLevels; // Exemple: 8 niveaux débloqués sur 16
+        return unlockLevels;
     }
 
     selectLevel(levelIndex) {

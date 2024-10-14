@@ -9,30 +9,10 @@ class ResultScene extends Phaser.Scene {
         
     }
     
-    preload() {
-        const basePath = '../../assets/images/Game/';
-        
-        // Charger les images communes
-        const images = [
-            { key: 'Home', path: `${basePath}Home.png` },
-            { key: 'réessayer_bouton', path: `${basePath}réessayer_bouton.png` },
-            { key: 'game_background', path: '../../assets/images/Accueil_background.jfif' },
-            { key: 'success_interface', path: `${basePath}success_interface.png` },
-            { key: 'failed_interface', path: `${basePath}failed_interface.png` },
-            { key: 'star', path: `${basePath}star.png` },
-            { key: 'star_success', path: `${basePath}star_success.png` },
-            { key: 'Next_level', path: `${basePath}Next_level.png` }
-        ];
-        
-        // Charger toutes les images dans la boucle
-        images.forEach(img => this.load.image(img.key, img.path));
-        
-    }
-    
     create() {
         this.cameras.main.fadeIn(1000, 0, 0, 0);
         
-        this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'game_background').setOrigin(0.5);
+        this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'background').setOrigin(0.5);
 
 
         const centerX = this.cameras.main.width/2
@@ -166,8 +146,6 @@ class ResultScene extends Phaser.Scene {
             localStorage.setItem(`level${++gameState.LevelActually}`, 3);
             LevelList[gameState.LevelActually - 1].star = 3
         }
-
-        console.log(LevelList)
          
         starTweens.forEach(({ target, delay }) => {
             this.tweens.add({
@@ -177,10 +155,6 @@ class ResultScene extends Phaser.Scene {
                 delay
             });
         });
-    }
-
-    update() {
-        // Mettre à jour l'interface utilisateur si nécessaire
     }
 }
 

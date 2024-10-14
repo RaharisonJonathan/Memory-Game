@@ -34,45 +34,12 @@ export class GameScene extends Phaser.Scene {
         this.timeText = null; 
         this.timerEvent = null; 
     }
-
-    preload() {
-        const basePath = '../../assets/images/Game/';
-        
-        // Charger les images communes
-        const images = [
-            { key: 'game_background', path: '../../assets/images/Accueil_background.jfif' },
-            { key: 'dos', path: `${basePath}back_card.png` },
-            { key: 'music_off', path: `${basePath}music_off.png` },
-            { key: 'music_on', path: `${basePath}music_on.png` },
-            { key: 'Pause_button', path: `${basePath}Pause_button.png` },
-            { key: 'sound_off', path: `${basePath}sound_off.png` },
-            { key: 'sound_on', path: `${basePath}sound_on.png` },
-            { key: 'Clock', path: `${basePath}Clock.png` },
-            { key: 'Clock_progression_bar', path: `${basePath}Clock_progression_bar.png` },
-            { key: 'pause_interface', path: `${basePath}pause_interface.png` },
-            { key: 'Home', path: `${basePath}Home.png` },
-            { key: 'réessayer_bouton', path: `${basePath}réessayer_bouton.png` },
-            { key: 'Replay_button', path: `${basePath}Replay_button.png` },
-            { key: 'success_interface', path: `${basePath}success_interface.png` },
-            { key: 'failed_interface', path: `${basePath}failed_interface.png` },
-            { key: 'star', path: `${basePath}star.png` },
-            { key: 'star_success', path: `${basePath}star_success.png` }
-        ];
-    
-        // Charger toutes les images dans la boucle
-        images.forEach(img => this.load.image(img.key, img.path));
-    
-        // Charger les images des animaux
-        Data.forEach(data => this.load.image(data.key, `${basePath}animals/${data.key}.png`));
-    }
-    
-    
     create() {
         this.cameras.main.fadeIn(500, 0, 0, 0);
         this.timeLeft = gameState.levelTime; // Temps initial en secondes
 
         // Ajouter l'image de fond, centrée
-        this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'game_background')
+        this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'background')
             .setOrigin(0.5);
 
         // Vérifier si le son doit être joué
@@ -87,7 +54,7 @@ export class GameScene extends Phaser.Scene {
 
         // Démarrer la minuterie pour mettre à jour le temps restant
         this.timerEvent = this.time.addEvent({
-            delay: 1, // Mettre à jour toutes les secondes (1000 ms)
+            delay: 1,
             callback: this.updateTime,
             callbackScope: this,
             loop: true
@@ -114,24 +81,10 @@ export class GameScene extends Phaser.Scene {
         // Pause et autres interfaces
         this.pauseButton = this.createIconButton(10, 10, "Pause_button", () => this.PauseMenu());
         this.pauseInterface = this.createInterface(centerX, centerY, 'pause_interface', 99, 0);
-        this.successInterface = this.createInterface(centerX, centerY, 'success_interface', 99, 0);
-        this.failedInterface = this.createInterface(centerX, centerY, 'failed_interface', 99, 0);
 
         // Chronomètre et barre de progression
         this.clock = this.add.image(centerX, this.cameras.main.height / 7, "Clock").setOrigin(0.5, 0.5);
         this.clock_progression = this.add.image(centerX - 94, this.cameras.main.height / 7, "Clock_progression_bar").setInteractive().setOrigin(0, 0.5);
-
-        // Création des étoiles
-            const stars = [
-                { x: centerX - 80, y: centerY - 80 },
-                { x: centerX, y: centerY - 115 },
-                { x: centerX + 80, y: centerY - 80 },
-            ];
-            
-            stars.forEach((pos, index) => {
-                this[`star${index + 1}`] = this.createStar(pos.x, pos.y, "star", 100);
-                this[`star${index + 1}_success`] = this.createStar(pos.x, pos.y, "star_success", 101);
-            });
 
         // Gestion des événements pour les boutons
         this.replay.on('pointerdown', () => this.Replaygame());
@@ -159,13 +112,6 @@ export class GameScene extends Phaser.Scene {
     createInterface(x, y, texture, depth, scale = 1) {
         return this.add.image(x, y, texture)
             .setInteractive()
-            .setDepth(depth)
-            .setScale(scale);
-    }
-
-    createStar(x, y, texture, depth, scale = 0) {
-        return this.add.image(x, y, texture)
-            .setOrigin(0.5, 0.5)
             .setDepth(depth)
             .setScale(scale);
     }
@@ -420,8 +366,7 @@ export class GameScene extends Phaser.Scene {
             this.cameras.main.fadeOut(500, 0, 0, 0);
             this.scene.transition({
                 target: "ResultScene",
-                duration: 500,
-                // moveAbove: true,
+                duration: 200,
             });
     
             let currentLevelUnlocked = localStorage.getItem('currentLevel');
@@ -431,41 +376,6 @@ export class GameScene extends Phaser.Scene {
     
             console.log("Gagner");
         }
-    }
-    
-    animateSuccessUI() {
-        this.tweens.add({
-            targets: [this.pauseInterface, this.replay, this.reesayer, this.home, this.pauseButton, this.clock_progression, this.music, this.sound, this.clock],
-            scale: 0,
-            duration: 10,
-            onComplete: () => {
-                this.tweens.add({
-                    targets: [this.successInterface, this.star1, this.star2, this.star3],
-                    scale: 1,
-                    duration: 100,
-                    onComplete: () => {
-                        this.animateStarsSuccess();
-                    }
-                });
-            }
-        });
-    }
-    
-    animateStarsSuccess() {
-        const starTweens = [
-            { target: this.star1_success, delay: 0 },
-            { target: this.star2_success, delay: 400 },
-            { target: this.star3_success, delay: 800 }
-        ];
-    
-        starTweens.forEach(({ target, delay }) => {
-            this.tweens.add({
-                targets: target,
-                scale: 1,
-                duration: 400,
-                delay
-            });
-        });
     }
     
 

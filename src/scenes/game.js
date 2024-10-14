@@ -14,165 +14,23 @@
 
 // let music, flip, correct, start;
 
-// class StartScene extends Phaser.Scene {
-//     constructor() {
-//         super({ key: 'StartScene' });
-//         this.windowMenu = [];
-//     }
+class PreloadScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'preloadScene' });
+    }
 
-//     preload() {
-//         const assets = [
-//             ['background', 'Accueil_background.jfif'],
-//             ['Logo', 'assets/images/Accueil/Logo.png'],
-//             ['startButton', 'assets/images/Accueil/start_button.png'],
-//             ['settingButton', 'assets/images/Accueil/Setting_button.svg'],
-//             ['popupAccueil', 'assets/images/Accueil/Popup_accueil.png'],
-//             ['settingWindow', 'assets/images/Accueil/setting_window.png'],
-//             ['musicLabel', 'assets/images/Accueil/music_label.png'],
-//             ['soundLabel', 'assets/images/Accueil/sound_label.png'],
-//             ['okButton', 'assets/images/Accueil/ok_button.png'],
-//             ['cancelButton', 'assets/images/Accueil/cancel_button.png'],
-//             ['toggleOff', 'assets/images/Accueil/toggle_off.png'],
-//             ['toggleOn', 'assets/images/Accueil/toggle_on.png']
-//         ];
+    preload() {
+        this.load.image('background', '../../assets/images/Accueil_background.jfif');
+        this.load.image('preloading', '../../assets/images/preloading.png');
+        this.load.image('bar_progress', '../../assets/images/bar_progress.png');
 
-//         assets.forEach(([key, path]) => this.load.image(key, path));
+        this.load.on('complete', () => {
+            // Une fois le chargement terminé, passer à la StartScene
+            this.scene.start('LoadScene');
+          });
 
-//         // Audio files
-//         this.load.audio('music', 'assets/audio/music1.mp3');
-//         this.load.audio('flip', 'assets/audio/retournement.mp3');
-//         this.load.audio('correct', 'assets/audio/correct.mp3');
-//         this.load.audio('start', 'assets/audio/game-start.mp3');
-//     }
-
-//     create() {
-//         this.addBackground();
-//         this.addLogo();
-//         this.addButtons();
-//         this.addPopup();
-//         this.addSettingsWindow();
-
-//         // Add sounds
-//         music = this.sound.add('music', { loop: true, volume: 0.1 });
-//         flip = this.sound.add('flip', { volume: 0.5 });
-//         correct = this.sound.add('correct', { volume: 0.5 });
-//         start = this.sound.add('start', { volume: 0.2 });
-
-//         if (playMusic) music.play();
-
-//         // Animate logo
-//         this.tweens.add({
-//             targets: this.Logo,
-//             scale: 1.3,
-//             ease: 'Sine.easeInOut',
-//             duration: 800,
-//             yoyo: true,
-//             repeat: -1,
-//         });
-//     }
-
-//     addBackground() {
-//         this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'background').setOrigin(0.5);
-//     }
-
-//     addLogo() {
-//         this.Logo = this.add.image(this.cameras.main.width / 2, this.cameras.main.height * 0.3, 'Logo');
-//     }
-
-//     addButtons() {
-//         this.createButton('startButton', this.cameras.main.height * 5 / 7, this.startGame.bind(this)).setScale(0.9);
-//     }
-
-//     createButton(key, y, callback) {
-//         const button = this.add.image(this.cameras.main.width / 2, y, key).setInteractive();
-//         button.on('pointerdown', callback);
-//         return button;
-//     }
-
-//     addPopup() {
-//         this.popupAccueil = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'popupAccueil')
-//             .setOrigin(0.5)
-//             .setDisplaySize(this.cameras.main.width, this.cameras.main.height)
-//             .setInteractive()
-//             .setScale(0);
-
-//         this.windowMenu.push(this.popupAccueil);
-//         this.popupAccueil.on('pointerdown', this.hidePopup.bind(this));
-//     }
-
-//     addSettingsWindow() {
-//         this.settingWindow = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'settingWindow')
-//             .setInteractive()
-//             .setScale(0);
-
-//         this.windowMenu.push(this.settingWindow);
-//         this.addSettingsControls();
-//     }
-
-//     addSettingsControls() {
-//         const controls = [
-//             { key: 'soundLabel', x: this.cameras.main.width / 3, y: this.cameras.main.height / 2 - 50 },
-//             { key: 'musicLabel', x: this.cameras.main.width / 3 - 10, y: this.cameras.main.height / 2 },
-//             { key: 'toggleOn', x: this.cameras.main.width * 2 / 3 + 20, y: this.cameras.main.height / 2 - 50, toggle: true },
-//             { key: 'toggleOff', x: this.cameras.main.width * 2 / 3 + 20, y: this.cameras.main.height / 2, toggle: true },
-//             { key: 'cancelButton', x: this.cameras.main.width / 3, y: this.cameras.main.height / 2 + 100 },
-//             { key: 'okButton', x: this.cameras.main.width * 2 / 3, y: this.cameras.main.height / 2 + 100 }
-//         ];
-
-//         controls.forEach(({ key, x, y, toggle }) => {
-//             const image = this.add.image(x, y, key).setInteractive().setScale(0);
-//             this.windowMenu.push(image);
-//             if (toggle) {
-//                 image.on('pointerdown', () => this.toggleImage(image));
-//             } else {
-//                 image.on('pointerdown', this.hidePopup.bind(this));
-//             }
-//         });
-//     }
-
-//     toggleImage(image) {
-//         image.setTexture(image.texture.key === 'toggleOn' ? 'toggleOff' : 'toggleOn');
-//     }
-
-//     showSettings() {
-//         this.animateButton(this.settingButton, () => {
-//             this.tweens.add({ targets: this.windowMenu, scale: 1, duration: 75 });
-//         });
-//     }
-
-//     hidePopup() {
-//         this.tweens.add({ targets: this.windowMenu, scale: 0, duration: 75 });
-//     }
-
-//     startGame() {
-//         this.animateButton(this.startButton, () => {
-//             this.cameras.main.fadeOut(500, 0, 0, 0);
-//             this.scene.transition({
-//                 target: "LevelSelectScene",
-//                 duration: 1000,
-//                 moveAbove: true,
-//             });
-//         });
-//     }
-
-//     animateButton(button, onComplete) {
-//         this.tweens.add({
-//             targets: button,
-//             scaleX: 0.9,
-//             scaleY: 0.9,
-//             duration: 100,
-//             onComplete: () => {
-//                 this.tweens.add({
-//                     targets: button,
-//                     scaleX: 1,
-//                     scaleY: 1,
-//                     duration: 100,
-//                     onComplete
-//                 });
-//             }
-//         });
-//     }
-// }
+    }
+}
 
 
 
@@ -1031,8 +889,10 @@
 
 import GameScene from "./GameScene.js";
 import LevelSelectScene from "./LevelSelectScene.js";
+import { LoadScene } from "./LoadScene.js";
 import ResultScene from "./ResultScene.js";
 import StartScene from "./StartScene.js";
+
 
 
 
@@ -1051,7 +911,7 @@ const config = {
     scale: {
         mode: Phaser.Scale.FIT,
     },
-    scene: [StartScene, GameScene, ResultScene, LevelSelectScene]
+    scene: [PreloadScene,LoadScene, StartScene, GameScene, ResultScene, LevelSelectScene]
 };
 const game = new Phaser.Game(config);
 
