@@ -126,7 +126,6 @@ export class GameScene extends Phaser.Scene {
     toggleMusic() {
         gameState.playMusic = !gameState.playMusic;
         this.music.setTexture(gameState.playMusic ? "music_on" : "music_off");
-        gameState.playMusic ? gameState.music.play() : gameState.music.pause();
     }
 
     // Masquage du menu pause
