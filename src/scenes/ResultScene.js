@@ -113,14 +113,12 @@ class ResultScene extends Phaser.Scene {
             scale: 1,
             duration: 100,
             onComplete: () => {
-                        if(gameState.playSound){
-                            if(gameState.passed){
-                                gameState.success.play()
-                                this.animateStarsSuccess();
-                            }
-                            else{
-                                gameState.fail.play()
-                            }
+                        if(gameState.passed){
+                            gameState.playSound ? gameState.success.play() : gameState.success.pause()
+                            this.animateStarsSuccess();
+                        }
+                        else{
+                        gameState.playSound ? gameState.fail.play() : gameState.fail.pause()
                         }
                     }
                 });
